@@ -150,7 +150,7 @@
                                 el.parent().parent().siblings('.input-price').find('.price').val(item.product.purchase_price);
                                 $(el.parent().parent().find('.discount')).val(0);
                             }
-                            
+
 
                             var taxes = '';
                             var tax = [];
@@ -171,7 +171,7 @@
                                 var itemTaxPrice = parseFloat((totalItemTaxRate / 100) * (item.product.purchase_price * 1));
                             }
 
-                     
+
 
                             // $(el.parent().parent().find('.itemTaxPrice')).val(itemTaxPrice.toFixed(2));
                             // $(el.parent().parent().find('.itemTaxRate')).val(totalItemTaxRate.toFixed(2));
@@ -496,7 +496,7 @@
                                 <th>{{__('Items')}}</th>
                                 <th>{{__('Quantity')}}</th>
                                 <th>{{__('Price')}} </th>
-                                <th>{{__('Tax')}} (%)</th>
+                                {{--  <th>{{__('Tax')}} (%)</th>  --}}
                                 <th>{{__('Discount')}}</th>
                                 <th class="text-end">{{__('Amount')}} <br><small class="text-danger font-weight-bold">{{__('before tax & discount')}}</small></th>
                                 <th></th>
@@ -522,7 +522,7 @@
                                         <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
                                     </div>
                                 </td>
-                                <td>
+                                {{--  <td>
                                     <div class="form-group">
                                         <div class="input-group">
                                             <div class="taxes"></div>
@@ -531,7 +531,7 @@
                                             {{ Form::hidden('itemTaxRate','', array('class' => 'form-control itemTaxRate')) }}
                                         </div>
                                     </div>
-                                </td>
+                                </td>  --}}
                                 <td>
                                     <div class="form-group price-input input-group search-form">
                                         {{ Form::text('discount',null, array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount'))) }}
@@ -548,14 +548,14 @@
                                     @endcan
                                 </td>
                             </tr>
-                            <tr>
+                            {{--  <tr>
                                 <td colspan="2">
                                     <div class="form-group">
                                         {{ Form::textarea('description', null, ['class'=>'form-control','rows'=>'2','placeholder'=>__('Description')]) }}
                                     </div>
                                 </td>
                                 <td colspan="5"></td>
-                            </tr>
+                            </tr>  --}}
                             </tbody>
                             <tfoot>
                             <tr>

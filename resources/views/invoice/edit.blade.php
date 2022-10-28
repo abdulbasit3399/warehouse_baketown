@@ -5,7 +5,7 @@
 @section('breadcrumb')
 <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
     <li class="breadcrumb-item"><a href="{{route('invoice.index')}}">{{__('Invoice')}}</a></li>
-    <li class="breadcrumb-item">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>  
+    <li class="breadcrumb-item">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}</li>
 @endsection
 @push('script-page')
     <script src="{{asset('js/jquery-ui.min.js')}}"></script>
@@ -473,7 +473,7 @@
                                 <th>{{__('Items')}}</th>
                                 <th>{{__('Quantity')}}</th>
                                 <th>{{__('Price')}} </th>
-                                <th>{{__('Tax')}}</th>
+                                {{--  <th>{{__('Tax')}}</th>  --}}
                                 <th>{{__('Discount')}}</th>
                                 <th class="text-end">{{__('Amount')}} </th>
                                 <th></th>
@@ -499,7 +499,7 @@
                                         <span class="input-group-text bg-transparent">{{\Auth::user()->currencySymbol()}}</span>
                                     </div>
                                 </td>
-                                <td>
+                                {{--  <td>
                                     <div class="form-group">
                                         <div class="input-group colorpickerinput">
                                             <div class="taxes"></div>
@@ -508,7 +508,7 @@
                                             {{ Form::hidden('itemTaxRate','', array('class' => 'form-control itemTaxRate')) }}
                                         </div>
                                     </div>
-                                </td>
+                                </td>  --}}
                                 <td>
                                 <div class="form-group price-input input-group search-form">
                                         {{ Form::text('discount',null, array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount'))) }}
@@ -523,14 +523,14 @@
                                     @endcan
                                 </td>
                             </tr>
-                            <tr>
+                            {{--  <tr>
                                 <td colspan="2">
                                     <div class="form-group">
                                         {{ Form::textarea('description', null, ['class'=>'form-control','rows'=>'2','placeholder'=>__('Description')]) }}
                                     </div>
                                 </td>
                                 <td colspan="5"></td>
-                            </tr>
+                            </tr>  --}}
                             </tbody>
                             <tfoot>
                             <tr>

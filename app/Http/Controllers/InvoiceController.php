@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InvoiceExport;
+use App\Imports\ImportInvoice;
+use App\Models\Tax;
 
 class InvoiceController extends Controller
 {
@@ -54,11 +56,11 @@ class InvoiceController extends Controller
                 $query->where('customer_id', '=', $request->customer);
             }
 
-            if (str_contains($request->issue_date, ' to ')) { 
+            if (str_contains($request->issue_date, ' to ')) {
                 $date_range = explode(' to ', $request->issue_date);
                 $query->whereBetween('issue_date', $date_range);
             }elseif(!empty($request->issue_date)){
-               
+
                 $query->where('issue_date', $request->issue_date);
             }
 
@@ -99,7 +101,7 @@ class InvoiceController extends Controller
 
     public function customer(Request $request)
     {
-        $customer = Customer::where('id', '=', $request->id)->first();
+        $customer = Customer::where('billing_name', '=', $request->billing_name)->first();
 
         return view('invoice.customer_detail', compact('customer'));
     }
@@ -175,7 +177,8 @@ class InvoiceController extends Controller
                 $type='invoice';
                 $type_id = $invoice->id;
                 $description=$invoiceProduct->quantity.'  '.__(' quantity sold in invoice').' '. \Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-                Utility::addProductStock( $products[$i]['item'],$invoiceProduct->quantity,$type,$description,$type_id);
+                $ut = new Utility();
+                $ut->addProductStock( $products[$i]['item'],$invoiceProduct->quantity,$type,$description,$type_id);
 
             }
             $customer = Customer::find($request->customer_id);
@@ -184,7 +187,7 @@ class InvoiceController extends Controller
 
             //Twilio Notification
             $setting  = Utility::settings(\Auth::user()->creatorId());
-            
+
 
             if(isset($setting['invoice_notification']) && $setting['invoice_notification'] ==1)
             {
@@ -268,7 +271,7 @@ class InvoiceController extends Controller
 
                     $invoiceProduct->quantity    = $products[$i]['quantity'];
                     // $invoiceProduct->tax         = $products[$i]['tax'];
-                    $invoiceProduct->discount    = $products[$i]['discount']; 
+                    $invoiceProduct->discount    = $products[$i]['discount'];
                     $invoiceProduct->price       = $products[$i]['price'];
                     // $invoiceProduct->description = $products[$i]['description'];
                     $invoiceProduct->save();
@@ -379,14 +382,14 @@ class InvoiceController extends Controller
 
             $query = Invoice::where('customer_id', '=', \Auth::user()->id)->where('status', '!=', '0')->where('created_by', \Auth::user()->creatorId());
 
-            if (str_contains($request->issue_date, ' to ')) { 
+            if (str_contains($request->issue_date, ' to ')) {
                 $date_range = explode(' to ', $request->issue_date);
                 $query->whereBetween('issue_date', $date_range);
             }elseif(!empty($request->issue_date)){
-               
+
                 $query->where('issue_date', $request->issue_date);
             }
-            
+
             // if (!empty($request->issue_date)) {
             //     $date_range = explode(' to ', $request->issue_date);
             //     $query->whereBetween('issue_date', $date_range);
@@ -712,7 +715,7 @@ class InvoiceController extends Controller
             'invoice_number' =>$invoice->invoice,
             'invoice_url' => $invoice->url,
         ];
-       
+
         try
         {
             $resp = Utility::sendEmailTemplate('customer_invoice_send', [$customer->id => $customer->email], $uArr);
@@ -991,8 +994,8 @@ class InvoiceController extends Controller
             }else{
                 return redirect()->back()->with('error', __($path['msg']));
             }
-            
-            
+
+
             // $path                 = $request->file('invoice_logo')->storeAs('/invoice_logo', $invoice_logo);
             $post['invoice_logo'] = $invoice_logo;
         }
@@ -1123,5 +1126,97 @@ class InvoiceController extends Controller
         $data = Excel::download(new InvoiceExport(), $name . '.xlsx');
 
         return $data;
+    }
+
+    public function importFile()
+    {
+        return view('invoice.import');
+    }
+
+    public function import(Request $request)
+    {
+        $rules = [
+            'file' => 'required',
+        ];
+
+        $validator = \Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            $messages = $validator->getMessageBag();
+
+            return redirect()->back()->with('error', $messages->first());
+        }
+
+        $invoice     = (new ImportInvoice)->toArray(request()->file('file'))[0];
+        $totalInvoice = count($invoice) - 1;
+        $errorArray   = [];
+        for ($i = 1; $i <= count($invoice) - 1; $i++) {
+            $items  = $invoice[$i];
+            // $taxes     = explode(';', $items[5]);
+
+            // $taxesData = [];
+            // foreach ($taxes as $tax) {
+
+            //     $taxes       = Tax::where('id', $tax)->first();
+            //     $taxesData[] = $taxes->id;
+            // }
+
+            // $taxData = implode(',', $taxesData);
+
+            // if (!empty($productBySku)) {
+            //     $productService = $productBySku;
+            // } else {
+            // }
+
+            $invoiceItems = new Invoice();
+            $invoiceItems->invoice_id     = $this->invoiceNumber();
+            $invoiceItems->status    = 1;
+            $cus = Customer::where('name', $items[0])->first();
+            if ($cus != null) {
+                $invoiceItems->customer_id = $cus->id;
+            }
+            $invoiceItems->issue_date     = $items[1];
+            $invoiceItems->due_date       = $items[2];
+            $invoiceItems->ref_number     = $items[3];
+            $invoiceItems->save();
+
+            $invoiceProducts                 = new InvoiceProduct();
+            $invoiceProducts->invoice_id     = $this->invoiceNumber();
+            $pro = ProductService::where('name', $items[4])->first();
+            if ($pro != null) {
+                $invoiceProducts->product_id = $pro->id;
+            }
+            $invoiceProducts->quantity       = $items[5];
+            $invoiceProducts->price          = $items[6];
+            $invoiceProducts->discount       = $items[7];
+            $invoiceProducts->save();
+
+            // if(empty($invoiceItems))
+            // {
+            //     $errorArray[] = $invoiceItems;
+            // }else {
+            //     $invoiceItems->save();
+            // }
+        }
+
+        $errorRecord = [];
+        if (empty($errorArray)) {
+
+            $data['status'] = 'success';
+            $data['msg']    = __('Record successfully imported');
+        } else {
+            $data['status'] = 'error';
+            $data['msg']    = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalInvoice . ' ' . 'record');
+
+
+            foreach ($errorArray as $errorData) {
+
+                $errorRecord[] = implode(',', $errorData);
+            }
+
+            \Session::put('errorArray', $errorRecord);
+        }
+
+        return redirect()->route('invoice.index')->with($data['status'], $data['msg']);
     }
 }

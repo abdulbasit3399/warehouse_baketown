@@ -74,7 +74,7 @@ Route::group(
     Route::get('/contract/{id}/file/{fid}','ContractController@fileDownload')->name('contract.file.download')->middleware(['auth','XSS']);
     Route::delete('/contract/{id}/file/delete/{fid}','ContractController@fileDelete')->name('contract.file.delete')->middleware(['auth','XSS']);
     Route::post('/contract/{id}/comment','ContractController@commentStore')->name('comment.store')->middleware(['auth','XSS']);
-    Route::get('/contract/{id}/comment','ContractController@commentDestroy')->name('comment.destroy')->middleware(['auth','XSS']);  
+    Route::get('/contract/{id}/comment','ContractController@commentDestroy')->name('comment.destroy')->middleware(['auth','XSS']);
     Route::post('/contract/{id}/note', 'ContractController@noteStore')->name('contract.note.store')->middleware(['auth','XSS']);
     Route::get('/contract/{id}/note', 'ContractController@noteDestroy')->name('contract.note.destroy')->middleware(['auth','XSS']);
     Route::get('contract/pdf/{id}', 'ContractController@pdffromcontract')->name('contract.download.pdf')->middleware(['auth','XSS']);
@@ -161,7 +161,7 @@ Route::prefix('customer')->as('customer.')->group(
                 'XSS','revalidate',
             ]
         );
-        
+
         Route::post('retainer/{id}/send/mail', 'RetainerController@customerRetainerSendMail')->name('retainer.send.mail')->middleware(
             [
                 'auth:customer',
@@ -310,9 +310,9 @@ Route::prefix('customer')->as('customer.')->group(
         Route::get('contract/{id}/get_contract', 'ContractController@printContract')->name('get.contract')->middleware(['auth:customer','XSS']);
         Route::get('/signature/{id}', 'ContractController@signature')->name('signature')->middleware(['auth:customer','XSS']);
         Route::post('/signaturestore', 'ContractController@signatureStore')->name('signaturestore')->middleware(['auth:customer','XSS']);
-        
+
         Route::delete('/contract/{id}/file/delete/{fid}','ContractController@fileDelete')->name('contract.file.delete')->middleware(['auth:customer','XSS']);
-        Route::get('/contract/{id}/comment','ContractController@commentDestroy')->name('comment.destroy')->middleware(['auth:customer','XSS']);  
+        Route::get('/contract/{id}/comment','ContractController@commentDestroy')->name('comment.destroy')->middleware(['auth:customer','XSS']);
         Route::get('/contract/{id}/note', 'ContractController@noteDestroy')->name('contract.note.destroy')->middleware(['auth:customer','XSS']);
 
         Route::post('/contract_status_edit/{id}', 'ContractController@contract_status_edit')->name('contract.status')->middleware(['auth:customer','XSS']);
@@ -1057,6 +1057,11 @@ Route::get(
 
 // -------------------------------------import export------------------------------
 
+Route::get('import/invoice/file', 'InvoiceController@importFile')->name('invoice.file.import');
+Route::post('import/invoice', 'InvoiceController@import')->name('invoice.import');
+Route::get('export/invoice', 'InvoiceController@export')->name('invoice.export');
+
+
 Route::get('export/productservice', 'ProductServiceController@export')->name('productservice.export');
 Route::get('import/productservice/file', 'ProductServiceController@importFile')->name('productservice.file.import');
 Route::post('import/productservice', 'ProductServiceController@import')->name('productservice.import');
@@ -1071,7 +1076,6 @@ Route::post('import/vender', 'VenderController@import')->name('vender.import');
 
 
 Route::get('export/Proposal', 'ProposalController@export')->name('proposal.export');
-Route::get('export/invoice', 'InvoiceController@export')->name('invoice.export');
 Route::get('export/Bill', 'BillController@export')->name('Bill.export');
 Route::get('export/retainer', 'RetainerController@export')->name('retainer.export');
 

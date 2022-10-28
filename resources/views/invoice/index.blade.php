@@ -18,6 +18,9 @@
             <i class="ti ti-filter"></i>
         </a> -->
 
+        <a href="#" data-size="md" data-bs-toggle="tooltip" title="{{__('Import')}}" data-url="{{ route('invoice.file.import') }}" data-ajax-popup="true" data-title="{{__('Import invoice CSV file')}}" class="btn btn-sm btn-primary">
+            <i class="ti ti-file-import"></i>
+        </a>
         <a href="{{ route('invoice.export') }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="{{__('Export')}}">
             <i class="ti ti-file-export"></i>
         </a>
