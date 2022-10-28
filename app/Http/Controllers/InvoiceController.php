@@ -1148,6 +1148,7 @@ class InvoiceController extends Controller
         }
 
         $invoice     = (new ImportInvoice)->toArray(request()->file('file'))[0];
+
         $totalInvoice = count($invoice) - 1;
         $errorArray   = [];
         for ($i = 1; $i <= count($invoice) - 1; $i++) {
@@ -1167,7 +1168,7 @@ class InvoiceController extends Controller
             //     $productService = $productBySku;
             // } else {
             // }
-
+            if($items[2] != null){
             $invoiceItems = new Invoice();
             $invoiceItems->invoice_id     = $this->invoiceNumber();
             $invoiceItems->status    = 1;
@@ -1179,7 +1180,10 @@ class InvoiceController extends Controller
             $invoiceItems->due_date       = $items[2];
             $invoiceItems->ref_number     = $items[3];
             $invoiceItems->save();
+            }
 
+            // for ($i = 1; $i <= count($invoice) - 1; $i++)
+            if(count($invoice) != null){
             $invoiceProducts                 = new InvoiceProduct();
             $invoiceProducts->invoice_id     = $this->invoiceNumber();
             $pro = ProductService::where('name', $items[4])->first();
@@ -1190,7 +1194,8 @@ class InvoiceController extends Controller
             $invoiceProducts->price          = $items[6];
             $invoiceProducts->discount       = $items[7];
             $invoiceProducts->save();
-
+            }
+            // dd($invoice);
             // if(empty($invoiceItems))
             // {
             //     $errorArray[] = $invoiceItems;
