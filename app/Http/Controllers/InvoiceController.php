@@ -1168,9 +1168,10 @@ class InvoiceController extends Controller
             //     $productService = $productBySku;
             // } else {
             // }
-            if($items[2] != null){
+        if($items[1] != null && $items[2] != null){
             $invoiceItems = new Invoice();
             $invoiceItems->invoice_id     = $this->invoiceNumber();
+
             $invoiceItems->status    = 1;
             $cus = Customer::where('name', $items[0])->first();
             if ($cus != null) {
@@ -1180,10 +1181,17 @@ class InvoiceController extends Controller
             $invoiceItems->due_date       = $items[2];
             $invoiceItems->ref_number     = $items[3];
             $invoiceItems->save();
-            }
+        }
 
-            // for ($i = 1; $i <= count($invoice) - 1; $i++)
-            if(count($invoice) != null){
+
+        $in_id = $invoiceItems->id;
+        // dd($in_id);
+        // for ($in_id = 1; $i <= count(array($in_id)); $i++){
+
+            // if(count(array($in_id)) == null){
+
+        if($items[6] != null && $in_id == $invoiceItems->id){
+
             $invoiceProducts                 = new InvoiceProduct();
             $invoiceProducts->invoice_id     = $this->invoiceNumber();
             $pro = ProductService::where('name', $items[4])->first();
@@ -1194,8 +1202,8 @@ class InvoiceController extends Controller
             $invoiceProducts->price          = $items[6];
             $invoiceProducts->discount       = $items[7];
             $invoiceProducts->save();
-            }
-            // dd($invoice);
+
+        }
             // if(empty($invoiceItems))
             // {
             //     $errorArray[] = $invoiceItems;
@@ -1212,7 +1220,6 @@ class InvoiceController extends Controller
         } else {
             $data['status'] = 'error';
             $data['msg']    = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalInvoice . ' ' . 'record');
-
 
             foreach ($errorArray as $errorData) {
 
