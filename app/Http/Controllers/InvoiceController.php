@@ -50,7 +50,9 @@ class InvoiceController extends Controller
 
             $status = Invoice::$statues;
 
-            $query = Invoice::where('created_by', '=', \Auth::user()->creatorId());
+            // $query = Invoice::where('created_by', '=', \Auth::user()->creatorId());
+            $query = Invoice::all();
+            // dd($query);
 
             if (!empty($request->customer)) {
                 $query->where('customer_id', '=', $request->customer);
@@ -72,8 +74,7 @@ class InvoiceController extends Controller
             if (!empty($request->status)) {
                 $query->where('status', '=', $request->status);
             }
-            $invoices = $query->orderBy('id','DESC')->get();
-
+            $invoices = Invoice::orderBy('id','DESC')->get();
             return view('invoice.index', compact('invoices', 'customer', 'status'));
         } else {
             return redirect()->back()->with('error', __('Permission Denied.'));
@@ -1147,70 +1148,54 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', $messages->first());
         }
 
-        $invoice     = (new ImportInvoice)->toArray(request()->file('file'))[0];
+        $items     = (new ImportInvoice)->toArray(request()->file('file'))[0];
+        $total = 0;
+        for($i = 1; $i < count($items); $i++)
+        {
+            $total = 0;
+            if($items[$i][0] != null){
 
-        $totalInvoice = count($invoice) - 1;
-        $errorArray   = [];
-        for ($i = 1; $i <= count($invoice) - 1; $i++) {
-            $items  = $invoice[$i];
-            // $taxes     = explode(';', $items[5]);
+                //invoice create
+                $invoiceItems = new Invoice();
+                $invoiceItems->invoice_id     = $this->invoiceNumber();
+                $invoiceItems->status         = 1;
+                $cus = Customer::where('name', $items[$i][0])->first();
+                if ($cus != null) {
+                    $invoiceItems->customer_id = $cus->id;
+                }
+                $invoiceItems->issue_date     = $items[$i][1];
+                $invoiceItems->due_date       = $items[$i][2];
+                $invoiceItems->ref_number     = $items[$i][3];
+                $invoiceItems->category_id    = 1;
+                $invoiceItems->save();
 
-            // $taxesData = [];
-            // foreach ($taxes as $tax) {
-
-            //     $taxes       = Tax::where('id', $tax)->first();
-            //     $taxesData[] = $taxes->id;
-            // }
-
-            // $taxData = implode(',', $taxesData);
-
-            // if (!empty($productBySku)) {
-            //     $productService = $productBySku;
-            // } else {
-            // }
-        if($items[1] != null && $items[2] != null){
-            $invoiceItems = new Invoice();
-            $invoiceItems->invoice_id     = $this->invoiceNumber();
-
-            $invoiceItems->status    = 1;
-            $cus = Customer::where('name', $items[0])->first();
-            if ($cus != null) {
-                $invoiceItems->customer_id = $cus->id;
             }
-            $invoiceItems->issue_date     = $items[1];
-            $invoiceItems->due_date       = $items[2];
-            $invoiceItems->ref_number     = $items[3];
-            $invoiceItems->save();
-        }
 
+            $total += ($items[$i][5] * $items[$i][6]) - $items[$i][7];
 
-        $in_id = $invoiceItems->id;
-        // dd($in_id);
-        // for ($in_id = 1; $i <= count(array($in_id)); $i++){
-
-            // if(count(array($in_id)) == null){
-
-        if($items[6] != null && $in_id == $invoiceItems->id){
-
+            $invoice_id = $invoiceItems->id;
             $invoiceProducts                 = new InvoiceProduct();
-            $invoiceProducts->invoice_id     = $this->invoiceNumber();
-            $pro = ProductService::where('name', $items[4])->first();
+            $invoiceProducts->invoice_id     = $invoice_id;
+            $pro = ProductService::where('name', $items[$i][4])->first();
             if ($pro != null) {
                 $invoiceProducts->product_id = $pro->id;
             }
-            $invoiceProducts->quantity       = $items[5];
-            $invoiceProducts->price          = $items[6];
-            $invoiceProducts->discount       = $items[7];
+            $invoiceProducts->quantity       = $items[$i][5];
+            $invoiceProducts->price          = $items[$i][6];
+            $invoiceProducts->discount       = $items[$i][7];
             $invoiceProducts->save();
 
+            // dump($customer_id);
+            // dump($total);
+            $customer_id = $invoiceItems->customer_id;
+
+            $product_id = $invoiceProducts->product_id;
+            Utility::total_quantity('minus',$items[$i][5],$product_id);
+
+            Utility::userBalance('customer', $customer_id, $invoiceItems->getTotal(), 'credit');
+
         }
-            // if(empty($invoiceItems))
-            // {
-            //     $errorArray[] = $invoiceItems;
-            // }else {
-            //     $invoiceItems->save();
-            // }
-        }
+        // dd($total);
 
         $errorRecord = [];
         if (empty($errorArray)) {
@@ -1219,7 +1204,7 @@ class InvoiceController extends Controller
             $data['msg']    = __('Record successfully imported');
         } else {
             $data['status'] = 'error';
-            $data['msg']    = count($errorArray) . ' ' . __('Record imported fail out of' . ' ' . $totalInvoice . ' ' . 'record');
+            $data['msg']    = count($errorArray) . ' ' . __('Record Failed to Import!');
 
             foreach ($errorArray as $errorData) {
 

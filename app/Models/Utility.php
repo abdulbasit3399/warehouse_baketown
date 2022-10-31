@@ -213,13 +213,13 @@ class Utility extends Model
     public static function getStorageSetting()
     {
         $data = DB::table('settings');
-        
+
             // $userId = \Auth::user()->creatorId();
             $data   = $data->where('created_by', '=', 1);
-       
+
         $data     = $data->get();
-        
-       
+
+
         $settings = [
             "storage_setting" => "",
             "local_storage_validation" => "",
@@ -281,10 +281,10 @@ class Utility extends Model
         }
         $data     = $data->get();
         $settings = [
-            
+
             'gdpr_cookie' => "",
             'cookie_text' => "",
-            
+
         ];
 
         foreach ($data as $row) {
@@ -1444,57 +1444,57 @@ class Utility extends Model
              'retainer_name' => '-',
              'retainer_number' => '-',
              'retainer_url' => '-',
-             
+
          ];
- 
+
          foreach($obj as $key => $val)
          {
              $arrValue[$key] = $val;
          }
- 
+
          $settings = Utility::settings();
          $company_name = $settings['company_name'];
-       
+
          $arrValue['app_name']     =  env('APP_NAME');
          $arrValue['company_name'] = self::settings()['company_name'];
          $arrValue['app_url']      = '<a href="' . env('APP_URL') . '" target="_blank">' . env('APP_URL') . '</a>';
- 
+
          return str_replace($arrVariable, array_values($arrValue), $content);
      }
- 
+
      // Email Template Modules Function START
      // Common Function That used to send mail with check all cases
      public static function sendEmailTemplate($emailTemplate, $mailTo, $obj)
      {
          $usr = \Auth::user();
- 
+
          //Remove Current Login user Email don't send mail to them
          unset($mailTo[$usr->id]);
- 
+
          $mailTo = array_values($mailTo);
- 
+
          if($usr->type != 'super admin')
          {
              // find template is exist or not in our record
              $template = EmailTemplate::where('slug', $emailTemplate)->first();
- 
+
              if(isset($template) && !empty($template))
              {
                  // check template is active or not by company
                  $is_active = UserEmailTemplate::where('template_id', '=', $template->id)->where('user_id', '=', $usr->creatorId())->first();
- 
+
                  if($is_active->is_active == 1)
                  {
                      $settings = self::settings();
- 
+
                      // get email content language base
                      $content = EmailTemplateLang::where('parent_id', '=', $template->id)->where('lang', 'LIKE', $usr->lang)->first();
- 
+
                      $content->from = $template->from;
-                   
+
                      if(!empty($content->content))
                      {
- 
+
                          $content->content = self::replaceVariable($content->content, $obj);
                          // send email
                          try
@@ -1503,10 +1503,10 @@ class Utility extends Model
                          }
                          catch(\Exception $e)
                          {
-                            
+
                              $error = __('E-Mail has been not sent due to SMTP configuration');
                          }
- 
+
                          if(isset($error))
                          {
                              $arReturn = [
@@ -1529,7 +1529,7 @@ class Utility extends Model
                              'error' => __('Mail not send, email is empty'),
                          ];
                      }
- 
+
                      return $arReturn;
                  }
                  else
@@ -1549,7 +1549,7 @@ class Utility extends Model
              }
          }
      }
- 
+
       // Make Entry in email_tempalte_lang table when create new language
       public static function makeEmailLang($lang)
       {
@@ -1565,7 +1565,7 @@ class Utility extends Model
               $emailTemplateLang->save();
           }
       }
-  
+
       // Email Template Modules Function END
 
 
@@ -1573,11 +1573,11 @@ class Utility extends Model
         try{
             $settings = Utility::getStorageSetting();
         //    dd($settings);
-            
+
             if(!empty($settings['storage_setting'])){
-               
+
                 if($settings['storage_setting'] == 'wasabi'){
-                    
+
                     config(
                         [
                             'filesystems.disks.wasabi.key' => $settings['wasabi_key'],
@@ -1587,7 +1587,7 @@ class Utility extends Model
                             'filesystems.disks.wasabi.endpoint' => 'https://s3.'.$settings['wasabi_region'].'.wasabisys.com'
                         ]
                     );
-                    
+
                     $max_size = !empty($settings['wasabi_max_upload_size'])? $settings['wasabi_max_upload_size']:'2048';
                     $mimes =  !empty($settings['wasabi_storage_validation'])? $settings['wasabi_storage_validation']:'';
 
@@ -1603,27 +1603,27 @@ class Utility extends Model
                     );
                     $max_size = !empty($settings['s3_max_upload_size'])? $settings['s3_max_upload_size']:'2048';
                     $mimes =  !empty($settings['s3_storage_validation'])? $settings['s3_storage_validation']:'';
-                  
+
 
                 }else{
                     $max_size = !empty($settings['local_storage_max_upload_size'])? $settings['local_storage_max_upload_size']:'2048';
-                    
+
                     $mimes =  !empty($settings['local_storage_validation'])? $settings['local_storage_validation']:'';
                 }
 
-                
+
                 $file = $request->$key_name;
-                
-               
+
+
                 if(count($custom_validation) > 0){
                     $validation =$custom_validation;
                 }else{
-                    
+
                     $validation =[
                         'mimes:'.$mimes,
                         'max:'.$max_size,
                     ];
-                   
+
                 }
                 $validator = \Validator::make($request->all(), [
                     $key_name =>$validation
@@ -1638,24 +1638,24 @@ class Utility extends Model
                 } else {
 
                     $name = $name;
-                   
+
                     if($settings['storage_setting']=='local')
                         {
                             $request->$key_name->move(storage_path($path), $name);
                             $path = $path.$name;
                         }
                     else if($settings['storage_setting'] == 'wasabi'){
-                        
+
                         $path = \Storage::disk('wasabi')->putFileAs(
                             $path,
                             $file,
                             $name
                         );
-                        
+
                         // $path = $path.$name;
 
                     }else if($settings['storage_setting'] == 's3'){
-                        
+
                         $path = \Storage::disk('s3')->putFileAs(
                             $path,
                             $file,
@@ -1664,8 +1664,8 @@ class Utility extends Model
                         // $path = $path.$name;
                         // dd($path);
                     }
-                  
-                 
+
+
                     $res = [
                         'flag' => 1,
                         'msg'  =>'success',
@@ -1681,7 +1681,7 @@ class Utility extends Model
                 ];
                 return $res;
             }
-        
+
         }catch(\Exception $e){
             $res = [
                 'flag' => 0,
@@ -1690,11 +1690,11 @@ class Utility extends Model
             return $res;
         }
     }
-     
+
 
     public static function get_file($path){
         $settings = Utility::getStorageSetting();
-        
+
         try {
             if($settings['storage_setting'] == 'wasabi'){
                 config(
@@ -1717,7 +1717,7 @@ class Utility extends Model
                     ]
                 );
             }
-            
+
             return \Storage::disk($settings['storage_setting'])->url($path);
         } catch (\Throwable $th) {
             return '';
@@ -1735,6 +1735,6 @@ class Utility extends Model
             return Utility::getValByName('company_logo_dark');
         }
     }
-     
+
 
 }
