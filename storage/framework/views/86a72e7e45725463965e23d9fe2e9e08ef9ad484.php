@@ -25,7 +25,7 @@
     <meta name="url" content="<?php echo e(url('').'/'.config('chatify.path')); ?>" data-user="<?php echo e(Auth::user()->id); ?>">
 
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>" />
-    
+
     <!-- Favicon icon -->
     <link rel="icon" href="<?php echo e($logo.'/'.(isset($company_favicon) && !empty($company_favicon)?$company_favicon:'favicon.png')); ?>" type="image" sizes="16x16">
 

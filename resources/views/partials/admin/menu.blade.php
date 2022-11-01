@@ -49,7 +49,7 @@
                 </li>
 
                 @if( Gate::check('manage customer proposal') )
-                
+
                     <li class="dash-item dash-hasmenu {{ (Request::segment(1) == 'customer.proposal' || Request::segment(1) == 'customer.retainer')?' active dash-trigger':''}}">
                         <a href="#!" class="dash-link "><span class="dash-micon"><i class="ti ti-building-bank"></i></span><span class="dash-mtext">{{__('Presale')}}</span>
                             <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
@@ -61,10 +61,10 @@
                                 </li>
                             @endcan
                             @can('manage customer proposal')
-                            
+
                                 <li class="dash-item {{ (Request::route()->getName() == 'customer.retainer' || Request::route()->getName() == 'customer.retainer.show') ? ' active' : '' }}">
                                     <a class="dash-link" href="{{ route('customer.retainer') }}">{{ __('Retainers') }}</a>
-                                    
+
                                 </li>
                             @endcan
                         </ul>
@@ -226,9 +226,9 @@
                 @endif -->
 
                 {{---------  Presale ------------}}
-               
+
                 @if( Gate::check('manage proposal') ||  (Gate::check('manage retainer')))
-                
+
                     <li class="dash-item dash-hasmenu {{ (Request::segment(1) == 'proposal' || Request::segment(1) == 'retainer')?' active dash-trigger':''}}">
                         <a href="#!" class="dash-link "><span class="dash-micon"><i class="ti ti-building-bank"></i></span><span class="dash-mtext">{{__('Presale')}}</span>
                             <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
@@ -240,10 +240,10 @@
                                 </li>
                             @endcan
                             @can('manage retainer')
-                            
+
                                 <li class="dash-item {{ (Request::route()->getName() == 'retainer.index' || Request::route()->getName() == 'retainer.create' || Request::route()->getName() == 'retainer.edit') ? ' active' : '' }}">
                                     <a class="dash-link" href="{{ route('retainer.index') }}">{{ __('Retainers') }}</a>
-                                    
+
                                 </li>
                             @endcan
                         </ul>
@@ -374,7 +374,7 @@
 
                 {{---------  Contract ------------}}
 
-                @if(Gate::check('manage contract')) 
+                @if(Gate::check('manage contract'))
                     <li class="dash-item {{ (Request::segment(1) == 'contract')?'active':''}}">
                         <a href="{{ route('contract.index') }}" class="dash-link ">
                             <span class="dash-micon"><i class="ti ti-businessplan"></i></span>
@@ -392,8 +392,8 @@
                     </li>
                 @endcan
 
-                
-                {{---------  Email Template ------------}}   
+
+                {{---------  Email Template ------------}}
                 @if (\Auth::user()->type == 'company')
                 <li class="dash-item {{ (Request::segment(1) == 'email_template_lang')?'active':''}}">
                     <a href="{{ route('manage.email.language',[$emailTemplate ->id,\Auth::user()->lang]) }}" class="dash-link"><span

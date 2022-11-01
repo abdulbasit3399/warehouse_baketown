@@ -25,7 +25,7 @@
     <meta name="url" content="{{ url('').'/'.config('chatify.path') }}" data-user="{{ Auth::user()->id }}">
 
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    
+
     <!-- Favicon icon -->
     <link rel="icon" href="{{$logo.'/'.(isset($company_favicon) && !empty($company_favicon)?$company_favicon:'favicon.png')}}" type="image" sizes="16x16">
 

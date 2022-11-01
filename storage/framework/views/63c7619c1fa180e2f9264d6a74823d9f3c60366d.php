@@ -49,7 +49,7 @@
                 </li>
 
                 <?php if( Gate::check('manage customer proposal') ): ?>
-                
+
                     <li class="dash-item dash-hasmenu <?php echo e((Request::segment(1) == 'customer.proposal' || Request::segment(1) == 'customer.retainer')?' active dash-trigger':''); ?>">
                         <a href="#!" class="dash-link "><span class="dash-micon"><i class="ti ti-building-bank"></i></span><span class="dash-mtext"><?php echo e(__('Presale')); ?></span>
                             <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
@@ -61,10 +61,10 @@
                                 </li>
                             <?php endif; ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage customer proposal')): ?>
-                            
+
                                 <li class="dash-item <?php echo e((Request::route()->getName() == 'customer.retainer' || Request::route()->getName() == 'customer.retainer.show') ? ' active' : ''); ?>">
                                     <a class="dash-link" href="<?php echo e(route('customer.retainer')); ?>"><?php echo e(__('Retainers')); ?></a>
-                                    
+
                                 </li>
                             <?php endif; ?>
                         </ul>
@@ -226,9 +226,9 @@
                 <?php endif; ?> -->
 
                 
-               
+
                 <?php if( Gate::check('manage proposal') ||  (Gate::check('manage retainer'))): ?>
-                
+
                     <li class="dash-item dash-hasmenu <?php echo e((Request::segment(1) == 'proposal' || Request::segment(1) == 'retainer')?' active dash-trigger':''); ?>">
                         <a href="#!" class="dash-link "><span class="dash-micon"><i class="ti ti-building-bank"></i></span><span class="dash-mtext"><?php echo e(__('Presale')); ?></span>
                             <span class="dash-arrow"><i data-feather="chevron-right"></i></span>
@@ -240,10 +240,10 @@
                                 </li>
                             <?php endif; ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage retainer')): ?>
-                            
+
                                 <li class="dash-item <?php echo e((Request::route()->getName() == 'retainer.index' || Request::route()->getName() == 'retainer.create' || Request::route()->getName() == 'retainer.edit') ? ' active' : ''); ?>">
                                     <a class="dash-link" href="<?php echo e(route('retainer.index')); ?>"><?php echo e(__('Retainers')); ?></a>
-                                    
+
                                 </li>
                             <?php endif; ?>
                         </ul>
@@ -374,7 +374,7 @@
 
                 
 
-                <?php if(Gate::check('manage contract')): ?> 
+                <?php if(Gate::check('manage contract')): ?>
                     <li class="dash-item <?php echo e((Request::segment(1) == 'contract')?'active':''); ?>">
                         <a href="<?php echo e(route('contract.index')); ?>" class="dash-link ">
                             <span class="dash-micon"><i class="ti ti-businessplan"></i></span>
@@ -392,8 +392,8 @@
                     </li>
                 <?php endif; ?>
 
+
                 
-                   
                 <?php if(\Auth::user()->type == 'company'): ?>
                 <li class="dash-item <?php echo e((Request::segment(1) == 'email_template_lang')?'active':''); ?>">
                     <a href="<?php echo e(route('manage.email.language',[$emailTemplate ->id,\Auth::user()->lang])); ?>" class="dash-link"><span

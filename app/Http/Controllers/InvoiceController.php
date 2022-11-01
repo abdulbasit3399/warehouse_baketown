@@ -309,7 +309,7 @@ class InvoiceController extends Controller
     function invoiceNumber()
     {
         $latest = Utility::getValByName('invoice_starting_number');
-        return $latest ;
+        return $latest + 1;
     }
 
     public function show($ids)
