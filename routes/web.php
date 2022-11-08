@@ -33,6 +33,8 @@ Route::get('invoice/{id}/show', 'InvoiceController@customerInvoiceShow')->name('
         'XSS','revalidate',
     ]
 );
+// Route::get('blog', [BlogController::class, 'index']);
+// Route::get('blog/list', [BlogController::class, 'getBlog'])->name('blog.list');
 
 // Email Templates
 Route::get('email_template_lang/{id}/{lang?}', 'EmailTemplateController@manageEmailLang')->name('manage.email.language')->middleware(['auth']);

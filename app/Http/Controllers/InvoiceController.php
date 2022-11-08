@@ -40,8 +40,38 @@ class InvoiceController extends Controller
         $this->middleware('auth', ['except' => ['invoice', 'payinvoice','export']]);
     }
 
+    // public function getBlog(Request $request){
+    //     if($request->ajax()){
+    //         $data = Invoice::orderBy('id','DESC')->get();
+    //     }
+    //     return DataTables::of($data)
+    //     ->getIndexColumn()
+    //     ->addColumn('action', function($row){
+    //         $actionBtn = '<a href="javascript:void(0);" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0);" class="delete btn btn-danger btn-sm">Delete</a>';
+    //         return $actionBtn;
+    //     })
+    //     ->rawColumns(['action'])
+    //     ->make(true);
+    //     // return view('welcome');
+
+    // }
+
     public function index(Request $request)
     {
+        // if ($request->ajax()) {
+        //     $data = Invoice::select('*');
+        //     return Datatables::of($data)
+        //             ->addIndexColumn()
+        //             ->addColumn('action', function($row){
+
+        //                     $btn = '<a href="javascript:void(0)" class="edit btn btn-primary btn-sm">View</a>';
+
+        //                     return $btn;
+        //             })
+        //             ->rawColumns(['action'])
+        //             ->make(true);
+        // }
+        // return view('invoice.index');
 
         if (\Auth::user()->can('manage invoice')) {
 
