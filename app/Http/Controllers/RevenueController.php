@@ -8,10 +8,13 @@ use App\Models\InvoicePayment;
 use App\Models\Mail\InvoicePaymentCreate;
 use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
+use App\Models\Voucher;
+
 use App\Models\Transaction;
 use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class RevenueController extends Controller
 {
@@ -32,14 +35,14 @@ class RevenueController extends Controller
 
             $query = Revenue::where('created_by', '=', \Auth::user()->creatorId());
 
-            if (str_contains($request->date, ' to ')) { 
+            if (str_contains($request->date, ' to ')) {
                 $date_range = explode(' to ', $request->date);
                 $query->whereBetween('date', $date_range);
             }elseif(!empty($request->date)){
-               
+
                 $query->where('date', $request->date);
             }
-            
+
             // if(!empty($request->date))
             // {
             //     $date_range = explode(' to ', $request->date);
@@ -128,7 +131,7 @@ class RevenueController extends Controller
                 $fileName = time() . "_" . $request->add_receipt->getClientOriginalName();
                 // $request->add_receipt->storeAs('uploads/revenue', $fileName);
                 $revenue->add_receipt = $fileName;
-                
+
 
 
                 $dir        = 'uploads/revenue';
@@ -143,6 +146,17 @@ class RevenueController extends Controller
             }
             $revenue->created_by     = \Auth::user()->creatorId();
             $revenue->save();
+
+
+            $voc                 = new Voucher();
+            $voc->user_id        = $request->customer_id;
+            $voc->invoice_id     = 0;
+            $voc->revenue_id     = $revenue->id;
+            $voc->voucher_no     = 'VOC'.rand(10000, 99999);
+            $voc->date           = Carbon::now();
+            $voc->credit         = $request->amount;
+            $voc->save();
+
 
             $category            = ProductServiceCategory::where('id', $request->category_id)->first();
             $revenue->payment_id = $revenue->id;
@@ -179,7 +193,7 @@ class RevenueController extends Controller
             {
                 $resp = Utility::sendEmailTemplate('invoice_payment_create', [$customer->id => $customer->email], $uArr);
             }
-            
+
             catch(\Exception $e)
             {
                 $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
@@ -268,11 +282,11 @@ class RevenueController extends Controller
                         \File::delete($path);
                     }
                 }
-                
+
                 $fileName = time() . "_" . $request->add_receipt->getClientOriginalName();
                 // $request->add_receipt->storeAs('uploads/revenue', $fileName);
                 $revenue->add_receipt = $fileName;
-                
+
 
 
                 $dir        = 'uploads/revenue';
@@ -286,6 +300,16 @@ class RevenueController extends Controller
                 $revenue->save();
             }
             $revenue->save();
+
+            $voc                 = Voucher::where('revenue_id', $revenue->id)->first();
+            $voc->user_id        = $request->customer_id;
+            $voc->invoice_id     = 0;
+            $voc->revenue_id     = $revenue->id;
+            $voc->voucher_no     = 'VOC'.rand(10000, 99999);
+            $voc->date           = Carbon::now();
+            $voc->credit         = $request->amount;
+            $voc->save();
+
 
             $category            = ProductServiceCategory::where('id', $request->category_id)->first();
             $revenue->category   = $category->name;

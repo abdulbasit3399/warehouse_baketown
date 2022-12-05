@@ -17,6 +17,9 @@ use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\Vender;
 use App\Models\User;
+use App\Models\Voucher;
+use App\Models\Customer;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -43,11 +46,11 @@ class BillController extends Controller
                 $query->where('vender_id', '=', $request->vender);
             }
 
-            if (str_contains($request->bill_date, ' to ')) { 
+            if (str_contains($request->bill_date, ' to ')) {
                 $date_range = explode(' to ', $request->bill_date);
                 $query->whereBetween('bill_date', $date_range);
             }elseif(!empty($request->bill_date)){
-               
+
                 $query->where('bill_date', $request->bill_date);
             }
 
@@ -67,6 +70,27 @@ class BillController extends Controller
         }
     }
 
+    public function customerbill(Request $request)
+    {
+        $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+        $customer->prepend('Select Customer', '');
+
+        $result = Voucher::where('date', '<=', date('Y-m-d'));
+        if (!empty($request->customer)) {
+            $result->where('user_id', '=', $request->customer);
+        }
+
+        if (str_contains($request->date, ' to ')) {
+            $date_range = explode(' to ', $request->date);
+            $result->whereBetween('date', $date_range);
+        }elseif(!empty($request->date)){
+
+            $result->where('date', $request->date);
+        }
+        $results = $result->get();
+
+        return view('bill.customer_bill', compact('results', 'customer'));
+    }
 
     public function create($vendorId)
     {
@@ -132,7 +156,7 @@ class BillController extends Controller
                 $billProduct->quantity    = $products[$i]['quantity'];
                 $billProduct->tax         = $products[$i]['tax'];
                 // $billProduct->discount    = (isset($request->discount_apply)) ? isset($products[$i]['discount']) ? $products[$i]['discount'] : 0: 0;
-                $billProduct->discount    = $products[$i]['discount']; 
+                $billProduct->discount    = $products[$i]['discount'];
                 $billProduct->price       = $products[$i]['price'];
                 $billProduct->description = $products[$i]['description'];
                 $billProduct->save();
@@ -270,7 +294,7 @@ class BillController extends Controller
 
                     $billProduct->quantity    = $products[$i]['quantity'];
                     $billProduct->tax         = $products[$i]['tax'];
-                    $billProduct->discount    = $products[$i]['discount'];  
+                    $billProduct->discount    = $products[$i]['discount'];
                     $billProduct->price       = $products[$i]['price'];
                     $billProduct->description = $products[$i]['description'];
                     $billProduct->save();
@@ -479,7 +503,7 @@ class BillController extends Controller
                 }else{
                     return redirect()->back()->with('error', __($path['msg']));
                 }
-                
+
                 $billPayment->save();
             }
             $billPayment->save();
@@ -585,14 +609,14 @@ class BillController extends Controller
             if (!empty($request->vender)) {
                 $query->where('id', '=', $request->vender);
             }
-            if (str_contains($request->bill_date, ' to ')) { 
+            if (str_contains($request->bill_date, ' to ')) {
                 $date_range = explode(' to ', $request->bill_date);
                 $query->whereBetween('bill_date', $date_range);
             }elseif(!empty($request->bill_date)){
-               
+
                 $query->where('bill_date', $request->bill_date);
             }
-            
+
             // if (!empty($request->bill_date)) {
             //     $date_range = explode(' to ', $request->bill_date);
             //     $query->whereBetween('bill_date', $date_range);
@@ -936,7 +960,7 @@ class BillController extends Controller
                     'bill_logo' => 'image',
                 ]
             );
-            
+
 
 
             $dir = 'bill_logo/';
@@ -954,7 +978,7 @@ class BillController extends Controller
             }
 
 
-           
+
             // $path                 = $request->file('bill_logo')->storeAs('/bill_logo', $bill_logo);
             $post['bill_logo'] = $bill_logo;
         }

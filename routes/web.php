@@ -840,6 +840,8 @@ Route::group(
         ],
     ],
     function () {
+        Route::get('bill/customerbill', 'BillController@customerbill')->name('customer.bill');
+
 
         Route::get('bill/{id}/duplicate', 'BillController@duplicate')->name('bill.duplicate');
         Route::get('bill/{id}/shipping/print', 'BillController@shippingDisplay')->name('bill.shipping.print');

@@ -313,8 +313,8 @@
                                 </li>
                             <?php endif; ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage payment')): ?>
-                                <li class="dash-item <?php echo e((Request::route()->getName() == 'payment.index' || Request::route()->getName() == 'payment.create' || Request::route()->getName() == 'payment.edit') ? ' active' : ''); ?>">
-                                    <a class="dash-link" href="<?php echo e(route('payment.index')); ?>"><?php echo e(__('Payment')); ?></a>
+                                <li class="dash-item  <?php echo e((Request::route()->getName() == 'customer.bill' || Request::route()->getName() == 'customer.bill' || Request::route()->getName() == 'customer.bill' || Request::route()->getName() == 'customer.bill') ? ' active' : ''); ?>">
+                                    <a class="dash-link" href="<?php echo e(route('customer.bill')); ?>"><?php echo e(__('Customer Bill')); ?></a>
                                 </li>
                             <?php endif; ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('manage debit note')): ?>

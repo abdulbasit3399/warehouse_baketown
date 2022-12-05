@@ -22,6 +22,8 @@ use App\Models\Task;
 use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\User;
+use App\Models\Voucher;
+
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -32,6 +34,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InvoiceExport;
 use App\Imports\ImportInvoice;
 use App\Models\Tax;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -212,6 +215,19 @@ class InvoiceController extends Controller
                 $ut->addProductStock( $products[$i]['item'],$invoiceProduct->quantity,$type,$description,$type_id);
 
             }
+
+            $voc                 = new Voucher();
+            $voc->user_id        = $request->customer_id;
+            $voc->invoice_id     = $invoice->id;
+            $voc->revenue_id     = 0;
+            $voc->voucher_no     = 'VOC'.rand(10000, 99999);
+            $voc->date           = Carbon::now();
+            $in = Invoice::where('id', $invoice->id)->first();
+            $due                 = $in->getDue();
+            $total               = $in->getTotal();
+            $voc->debit          = $total;
+            $voc->save();
+
             $customer = Customer::find($request->customer_id);
 
             Utility::userBalance('customer', $customer->id, $invoice->getTotal(), 'credit');
@@ -326,6 +342,28 @@ class InvoiceController extends Controller
                     // Utility::addProductStock( $products[$i]['item'],$products[$i]['quantity'],$type,$description,$type_id);
 
                 }
+
+                $voc                 = Voucher::where('invoice_id', $invoice->id)->first();
+
+                $voc->user_id        = $request->customer_id;
+                $voc->invoice_id     = $invoice->id;
+
+                $voc->revenue_id     = 0;
+                $voc->voucher_no     = 'VOC'.rand(10000, 99999);
+                $voc->date           = Carbon::now();
+
+                $in = Invoice::where('id', $invoice->id)->first();
+                $due                 = $in->getDue();
+                $total               = $in->getTotal();
+                $voc->debit          = $total;
+
+                // if($voc->debit != null)
+                // {
+                //     $voc->amount         = $total.'Dr';
+                // }
+                // dd($voc);
+
+                $voc->save();
 
                 return redirect()->route('invoice.index')->with('success', __('Invoice successfully updated.'));
             } else {

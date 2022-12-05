@@ -313,8 +313,8 @@
                                 </li>
                             @endcan
                             @can('manage payment')
-                                <li class="dash-item {{ (Request::route()->getName() == 'payment.index' || Request::route()->getName() == 'payment.create' || Request::route()->getName() == 'payment.edit') ? ' active' : '' }}">
-                                    <a class="dash-link" href="{{route('payment.index')}}">{{ __('Payment') }}</a>
+                                <li class="dash-item  {{ (Request::route()->getName() == 'customer.bill' || Request::route()->getName() == 'customer.bill' || Request::route()->getName() == 'customer.bill' || Request::route()->getName() == 'customer.bill') ? ' active' : '' }}">
+                                    <a class="dash-link" href="{{ route('customer.bill') }}">{{__('Customer Bill')}}</a>
                                 </li>
                             @endcan
                             @can('manage debit note')

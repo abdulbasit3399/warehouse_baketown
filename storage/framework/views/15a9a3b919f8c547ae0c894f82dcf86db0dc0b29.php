@@ -252,21 +252,6 @@
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
-                        <div class="container">
-                            <h1>Laravel 9 Yajra Datatables Tutorial - ItSolutionStuff.com</h1>
-                            <table class="table table-bordered data-table">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Issue Date</th>
-                                        <th width="100px">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-
 
                     </div>
                 </div>
@@ -274,24 +259,6 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
-<?php $__env->startPush('script-page'); ?>
 
-<script type="text/javascript">
-    $(function () {
-
-      var table = $('.data-table').DataTable({
-          processing: true,
-          serverSide: true,
-          ajax: "<?php echo e(route('invoice.index')); ?>",
-          columns: [
-              {data: 'id', name: 'id'},
-              {data: 'issue_date', name: 'issue_date'},
-              {data: 'action', name: 'action', orderable: false, searchable: false},
-          ]
-      });
-
-    });
-  </script>
-<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\laragon\www\warehouse_baketown\resources\views/invoice/index.blade.php ENDPATH**/ ?>
